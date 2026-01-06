@@ -87,12 +87,12 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     },
     android: {
       edgeToEdgeEnabled: true,
-      adaptiveIcon: {
-        foregroundImage: isDev
-          ? './assets/adaptive-foreground-dev.png'
-          : './assets/adaptive-foreground.png',
-        backgroundColor: '#190dc0',
-      },
+      // adaptiveIcon: {
+      //   foregroundImage: isDev
+      //     ? './assets/adaptive-foreground-dev.png'
+      //     : './assets/adaptive-foreground.png',
+      //   backgroundColor: '#190dc0',
+      // },
       package: packageName,
     },
   }

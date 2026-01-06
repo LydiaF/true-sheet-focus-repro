@@ -1,8 +1,9 @@
-import { View, Text, TextInput, Pressable, ScrollView } from 'react-native'
+import { View, Text, TextInput, Pressable } from 'react-native'
+import { ScrollView } from 'react-native-gesture-handler'
 import { useRef } from 'react'
 import { ReanimatedTrueSheet } from '@lodev09/react-native-true-sheet/reanimated'
 import type { TrueSheet } from '@lodev09/react-native-true-sheet'
-import { PressableScale } from 'pressto'
+import { PressableScaleNative } from 'pressto'
 
 export default function Repro() {
   const inputRef1 = useRef<TextInput>(null)
@@ -37,14 +38,14 @@ export default function Repro() {
             placeholder="Input 2"
             style={{ borderWidth: 1, borderColor: '#ccc', padding: 10, borderRadius: 8 }}
           />
-          <PressableScale
-            onPress={() => {
-              inputRef2.current?.focus()
+          <PressableScaleNative
+            onPressIn={() => {
+              requestAnimationFrame(() => inputRef2.current?.focus())
             }}
             style={{ padding: 15, backgroundColor: 'green', borderRadius: 8 }}
           >
             <Text style={{ color: 'white', textAlign: 'center' }}>Focus Input 2</Text>
-          </PressableScale>
+          </PressableScaleNative>
         </View>
       </ReanimatedTrueSheet>
     </ScrollView>

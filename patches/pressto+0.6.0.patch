@@ -1,0 +1,285 @@
+diff --git a/node_modules/pressto/lib/commonjs/pressables/custom/scale.js b/node_modules/pressto/lib/commonjs/pressables/custom/scale.js
+index 30e509b..fd28d63 100644
+--- a/node_modules/pressto/lib/commonjs/pressables/custom/scale.js
++++ b/node_modules/pressto/lib/commonjs/pressables/custom/scale.js
+@@ -3,17 +3,87 @@
+ Object.defineProperty(exports, "__esModule", {
+   value: true
+ });
+-exports.PressableScale = void 0;
++exports.PressableScaleNative = exports.PressableScale = void 0;
++var _react = _interopRequireDefault(require("react"));
++var _reactNative = require("react-native");
+ var _reactNativeReanimated = require("react-native-reanimated");
++var _reactNativeReanimated2 = _interopRequireDefault(require("react-native-reanimated"));
+ var _hoc = require("../hoc.js");
++var _index = require("../../provider/index.js");
++function _interopRequireDefault(e) { return e && e.__esModule ? e : { default: e }; }
+ const PressableScale = exports.PressableScale = (0, _hoc.createAnimatedPressable)((progress, {
+   config
+ }) => {
+   'worklet';
+
+   return {
+     transform: [{
+       scale: (0, _reactNativeReanimated.interpolate)(progress, [0, 1], [config.baseScale, config.minScale])
+     }]
+   };
+ });
++
++// RN Pressable-backed variant that avoids RNGH BaseButton -> TextInput focus quirks on iOS.
++const PressableScaleNative = exports.PressableScaleNative = ({
++  enabled = true,
++  onPress,
++  onPressIn,
++  onPressOut,
++  style,
++  children,
++  disabled,
++  ...rest
++}) => {
++  const {
++    animationType: animationTypeProvider,
++    animationConfig: animationConfigProvider,
++    globalHandlers,
++    config
++  } = (0, _index.usePressablesConfig)();
++
++  const progress = (0, _reactNativeReanimated.useSharedValue)(0);
++  const withAnimation = animationTypeProvider === 'timing' ? _reactNativeReanimated.withTiming : _reactNativeReanimated.withSpring;
++
++  const rStyle = (0, _reactNativeReanimated.useAnimatedStyle)(() => {
++    return {
++      transform: [{
++        scale: (0, _reactNativeReanimated.interpolate)(progress.value, [0, 1], [config.baseScale, config.minScale])
++      }]
++    };
++  }, [config.baseScale, config.minScale]);
++
++  const isDisabled = disabled ?? !enabled;
++
++  return /*#__PURE__*/_react.default.createElement(_reactNative.Pressable, {
++    ...rest,
++    disabled: isDisabled,
++    onPressIn: e => {
++      progress.value = withAnimation(1, animationConfigProvider);
++      globalHandlers?.onPressIn?.({
++        isPressed: true,
++        isToggled: false,
++        isSelected: false
++      });
++      onPressIn?.(e);
++    },
++    onPressOut: e => {
++      progress.value = withAnimation(0, animationConfigProvider);
++      globalHandlers?.onPressOut?.({
++        isPressed: false,
++        isToggled: false,
++        isSelected: false
++      });
++      onPressOut?.(e);
++    },
++    onPress: e => {
++      globalHandlers?.onPress?.({
++        isPressed: false,
++        isToggled: false,
++        isSelected: false
++      });
++      onPress?.(e);
++    }
++  }, /*#__PURE__*/_react.default.createElement(_reactNativeReanimated2.default.View, {
++    style: [style ?? {}, rStyle]
++  }, children));
++};
+diff --git a/node_modules/pressto/lib/module/pressables/custom/scale.js b/node_modules/pressto/lib/module/pressables/custom/scale.js
+index b1f47f4..a4d7d01 100644
+--- a/node_modules/pressto/lib/module/pressables/custom/scale.js
++++ b/node_modules/pressto/lib/module/pressables/custom/scale.js
+@@ -1,15 +1,84 @@
+ "use strict";
+
++import React from 'react';
++import { Pressable } from 'react-native';
+ import { interpolate } from 'react-native-reanimated';
++import Animated, { useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
+ import { createAnimatedPressable } from "../hoc.js";
++import { usePressablesConfig } from "../../provider/index.js";
+ export const PressableScale = createAnimatedPressable((progress, {
+   config
+ }) => {
+   'worklet';
+
+   return {
+     transform: [{
+       scale: interpolate(progress, [0, 1], [config.baseScale, config.minScale])
+     }]
+   };
+ });
++
++// RN Pressable-backed variant that avoids RNGH BaseButton -> TextInput focus quirks on iOS.
++export const PressableScaleNative = ({
++  enabled = true,
++  onPress,
++  onPressIn,
++  onPressOut,
++  style,
++  children,
++  disabled,
++  ...rest
++}) => {
++  const {
++    animationType: animationTypeProvider,
++    animationConfig: animationConfigProvider,
++    globalHandlers,
++    config
++  } = usePressablesConfig();
++
++  const progress = useSharedValue(0);
++  const withAnimation = animationTypeProvider === 'timing' ? withTiming : withSpring;
++
++  const rStyle = useAnimatedStyle(() => {
++    return {
++      transform: [{
++        scale: interpolate(progress.value, [0, 1], [config.baseScale, config.minScale])
++      }]
++    };
++  }, [config.baseScale, config.minScale]);
++
++  const isDisabled = disabled ?? !enabled;
++
++  return /*#__PURE__*/React.createElement(Pressable, {
++    ...rest,
++    disabled: isDisabled,
++    onPressIn: e => {
++      progress.value = withAnimation(1, animationConfigProvider);
++      globalHandlers?.onPressIn?.({
++        isPressed: true,
++        isToggled: false,
++        isSelected: false
++      });
++      onPressIn?.(e);
++    },
++    onPressOut: e => {
++      progress.value = withAnimation(0, animationConfigProvider);
++      globalHandlers?.onPressOut?.({
++        isPressed: false,
++        isToggled: false,
++        isSelected: false
++      });
++      onPressOut?.(e);
++    },
++    onPress: e => {
++      globalHandlers?.onPress?.({
++        isPressed: false,
++        isToggled: false,
++        isSelected: false
++      });
++      onPress?.(e);
++    }
++  }, /*#__PURE__*/React.createElement(Animated.View, {
++    style: [style ?? {}, rStyle]
++  }, children));
++};
+diff --git a/node_modules/pressto/lib/typescript/module/src/pressables/custom/scale.d.ts b/node_modules/pressto/lib/typescript/module/src/pressables/custom/scale.d.ts
+index 14d11d7..3d6a5c8 100644
+--- a/node_modules/pressto/lib/typescript/module/src/pressables/custom/scale.d.ts
++++ b/node_modules/pressto/lib/typescript/module/src/pressables/custom/scale.d.ts
+@@ -1,1 +1,4 @@
+ export declare const PressableScale: (props: import("../hoc").CustomPressableProps) => import("react/jsx-runtime").JSX.Element;
++export declare const PressableScaleNative: (props: import("react-native").PressableProps & {
++    enabled?: boolean;
++}) => import("react/jsx-runtime").JSX.Element;
+diff --git a/node_modules/pressto/src/pressables/custom/scale.ts b/node_modules/pressto/src/pressables/custom/scale.ts
+index 00d47ac..bd1f0b9 100644
+--- a/node_modules/pressto/src/pressables/custom/scale.ts
++++ b/node_modules/pressto/src/pressables/custom/scale.ts
+@@ -1,5 +1,14 @@
+-import { interpolate } from 'react-native-reanimated';
+-import { createAnimatedPressable } from '../hoc';
++import React from 'react';
++import { Pressable } from 'react-native';
++import Animated, {
++  interpolate,
++  useAnimatedStyle,
++  useSharedValue,
++  withSpring,
++  withTiming,
++} from 'react-native-reanimated';
++import { createAnimatedPressable } from '../hoc';
++import { usePressablesConfig } from '../../provider';
+
+ export const PressableScale = createAnimatedPressable((progress, { config }) => {
+   'worklet';
+@@ -13,4 +23,72 @@ export const PressableScale = createAnimatedPressable((progress, { config }) =>
+     ],
+   };
+ });
++
++// RN Pressable-backed variant that avoids RNGH BaseButton -> TextInput focus quirks on iOS.
++export const PressableScaleNative = ({
++  enabled = true,
++  onPress,
++  onPressIn,
++  onPressOut,
++  style,
++  children,
++  disabled,
++  ...rest
++}: React.ComponentProps<typeof Pressable> & { enabled?: boolean }) => {
++  const { animationType, animationConfig, globalHandlers, config } =
++    usePressablesConfig();
++
++  const progress = useSharedValue(0);
++  const withAnimation = animationType === 'timing' ? withTiming : withSpring;
++
++  const rStyle = useAnimatedStyle(() => {
++    return {
++      transform: [
++        {
++          scale: interpolate(progress.value, [0, 1], [
++            config.baseScale,
++            config.minScale,
++          ]),
++        },
++      ],
++    };
++  }, [config.baseScale, config.minScale]);
++
++  const isDisabled = disabled ?? !enabled;
++
++  return (
++    <Pressable
++      {...rest}
++      disabled={isDisabled}
++      onPressIn={(e) => {
++        progress.value = withAnimation(1, animationConfig);
++        globalHandlers?.onPressIn?.({
++          isPressed: true,
++          isToggled: false,
++          isSelected: false,
++        });
++        onPressIn?.(e);
++      }}
++      onPressOut={(e) => {
++        progress.value = withAnimation(0, animationConfig);
++        globalHandlers?.onPressOut?.({
++          isPressed: false,
++          isToggled: false,
++          isSelected: false,
++        });
++        onPressOut?.(e);
++      }}
++      onPress={(e) => {
++        globalHandlers?.onPress?.({
++          isPressed: false,
++          isToggled: false,
++          isSelected: false,
++        });
++        onPress?.(e);
++      }}
++    >
++      <Animated.View style={[style ?? {}, rStyle]}>{children}</Animated.View>
++    </Pressable>
++  );
++};
+
