@@ -1,0 +1,20 @@
+{
+  "platforms": [
+    "ios",
+    "android"
+  ],
+  "owner": "orlaya",
+  "androidNavigationBar": {
+    "enforceContrast": false,
+    "barStyle": "dark-content"
+  },
+  "assetBundlePatterns": [
+    "**/*"
+  ],
+  "experiments": {
+    "reactServerFunctions": false,
+    "tsconfigPaths": true
+  },
+  "userInterfaceStyle": "automatic",
+  "orientation": "portrait"
+}

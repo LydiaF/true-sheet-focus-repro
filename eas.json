@@ -1,0 +1,52 @@
+{
+  "cli": {
+    "version": ">= 16.7.2",
+    "appVersionSource": "remote"
+  },
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal",
+      "channel": "development",
+      "ios": {
+        "image": "latest",
+        "simulator": true
+      },
+      "env": {
+        "EXPO_USE_RSC": "0",
+        "EAS_BUILD_PROFILE": "development",
+        "EXPO_PUBLIC_WORKER_ENDPOINT": "",
+        "EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY": ""
+      }
+    },
+    "preview": {
+      "distribution": "internal",
+      "channel": "preview",
+      "ios": {
+        "image": "latest"
+      },
+      "env": {
+        "EXPO_USE_RSC": "0",
+        "EAS_BUILD_PROFILE": "preview",
+        "EXPO_PUBLIC_WORKER_ENDPOINT": "",
+        "EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY": ""
+      }
+    },
+    "production": {
+      "autoIncrement": true,
+      "channel": "production",
+      "ios": {
+        "image": "latest"
+      },
+      "env": {
+        "EXPO_USE_RSC": "0",
+        "EAS_BUILD_PROFILE": "production",
+        "EXPO_PUBLIC_WORKER_ENDPOINT": "",
+        "EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY": ""
+      }
+    }
+  },
+  "submit": {
+    "production": {}
+  }
+}
